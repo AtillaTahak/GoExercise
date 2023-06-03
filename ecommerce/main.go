@@ -12,6 +12,15 @@ type Product struct {
 	stock      bool
 	stockCount int
 }
+const (
+	PrintAllProducts = iota + 1
+	BuyProduct
+	SearchProduct
+	ShowStockProduct
+	ShowHighestPrice
+	ShowLowestPrice
+	Exit
+)
 
 func (p *Product) Buy() {
 	if p.stock && p.stockCount > 0 {
@@ -30,6 +39,7 @@ func searchProduct (products []Product ,name string){
 	for _,product := range products{
 		if product.name == name{
 			fmt.Printf("Your Product %+v",product)
+			return
 		}
 	}
 }
@@ -61,12 +71,12 @@ func main() {
 		fmt.Scanln(&choice)
 
 		switch choice {
-		case 1:
+		case PrintAllProducts:
 			fmt.Println("1. Print All Products")
 			for _, product := range products {
 				fmt.Println(product)
 			}
-		case 2:
+		case BuyProduct:
 			fmt.Println("2. Buy Products with Name")
 			fmt.Println("Enter the name of the product to buy: ")
 			fmt.Scanln(&productName)
@@ -76,27 +86,27 @@ func main() {
 					break
 				}
 			}
-		case 3:
+		case SearchProduct:
 			fmt.Println("3. Search Products")
 			fmt.Println("Enter the name of the product to search: ")
 			fmt.Scanln(&productName)
 			searchProduct(products , productName)
-		case 4:
+		case ShowStockProduct:
 			fmt.Println("4. Check Product Stock")
 			showOnStockProduct(products)
-		case 5:
+		case ShowHighestPrice:
 			fmt.Println("5. Show Product with highest Product")
 			sort.Slice(products, func(i, j int) bool {
 				return products[i].price < products[j].price
 			})
 			fmt.Print(products)
-		case 6:
+		case ShowLowestPrice:
 			fmt.Println("5 Show Product with Lowest Product")
 			sort.Slice(products, func(i, j int) bool {
 				return products[i].price > products[j].price
 			})
 			fmt.Print(products)
-		case 7:
+		case Exit:
 			chosen = false
 		default:
 			fmt.Println("Invalid choice")

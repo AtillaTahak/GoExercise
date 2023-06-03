@@ -1,8 +1,8 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"reflect"
 )
 
 type Student struct {
@@ -10,45 +10,57 @@ type Student struct {
 	age   int
 	grade int
 }
-
+const (
+	PrintAllStudents = iota + 1
+	ShowHighestGrade
+	ShowLowestGrade
+	CreateNewStudent
+	SearchStudent
+	Exit
+)
 func createStudent() Student {
 	var name string
-	var age int
-	var grade int
+	var age, grade int
+
 	fmt.Print("Enter name: ")
-	fmt.Scan(&name)
+	_, err := fmt.Scan(&name)
+	if err != nil {
+		fmt.Println("Invalid input for name")
+		return Student{"", 0, 0}
+	}
+
 	fmt.Print("Enter age: ")
-	fmt.Scan(&age)
+	_, err = fmt.Scan(&age)
+	if err != nil {
+		fmt.Println("Invalid input for age")
+		return Student{"", 0, 0}
+	}
+
 	fmt.Print("Enter grade: ")
-	fmt.Scan(&grade)
-	if reflect.TypeOf(name).Kind() != reflect.String {
-		fmt.Println("Invalid name")
+	_, err = fmt.Scan(&grade)
+	if err != nil {
+		fmt.Println("Invalid input for grade")
 		return Student{"", 0, 0}
 	}
-	if reflect.TypeOf(age).Kind() != reflect.Int {
-		fmt.Println("Invalid age")
-		return Student{"", 0, 0}
-	}
-	if reflect.TypeOf(grade).Kind() != reflect.Int {
-		fmt.Println("Invalid grade")
-		return Student{"", 0, 0}
-	}
+
 	return Student{name, age, grade}
 }
 
-func (s Student) find (students []Student, name string) Student {
+
+func (s Student) find (students []Student, name string) (Student,error) {
 	for _, student := range students {
 		if student.name == name {
-			return student
+			return student, nil
 		}
 	}
-	return Student{"", 0, 0}
+	return Student{"", 0, 0}, errors.New("Student not found")
 }
 func main() {
-	students := make([]Student, 0)
-	students = append(students, Student{"John", 21, 90})
-	students = append(students, Student{"Jane", 21, 95})
-	students = append(students, Student{"Bob", 21, 92})
+	students := []Student{
+		{"John", 21, 90},
+		{"Jane", 21, 95},
+		{"Bob", 21, 92},
+	}
 	for chosen := true; chosen; {
 		fmt.Println("1. Print all students")
 		fmt.Println("2. Print student with highest grade")
@@ -60,12 +72,12 @@ func main() {
 		fmt.Print("Enter your choice: ")
 		fmt.Scan(&choice)
 		switch choice {
-		case 1:
+		case PrintAllStudents:
 			fmt.Println("1. Print all students")
 			for _, student := range students {
 				fmt.Println(student)
 			}
-		case 2:
+		case ShowHighestGrade:
 			fmt.Println("2. Print student with highest grade")
 			highestGrade := 0
 			for _, student := range students {
@@ -78,7 +90,7 @@ func main() {
 					fmt.Println(student)
 				}
 			}
-		case 3:
+		case ShowLowestGrade:
 			fmt.Println("3. Print student with lowest grade")
 			lowestGrade := 100
 			for _, student := range students {
@@ -91,23 +103,23 @@ func main() {
 					fmt.Println(student)
 				}
 			}
-		case 4:
+		case CreateNewStudent:
 			fmt.Println("4. Create new student")
 			student := createStudent()
 			students = append(students, student)
-		case 5:
+		case SearchStudent:
 			fmt.Println("5. Search for student with name")
 			var name string
 			fmt.Print("Enter name: ")
 			fmt.Scan(&name)
 			student := Student{}
-			result := student.find(students, name)
-			if result.name == "" {
-				fmt.Println("Student not found")
+			result,err := student.find(students, name)
+			if err != nil {
+				fmt.Println(err)
 			} else {
 				fmt.Println(result)
 			}
-		case 6:
+		case Exit:
 			fmt.Println("6. Exit")
 			chosen = false
 		default:
