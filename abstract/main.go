@@ -1,29 +1,21 @@
 package main
 
-type Notifier interface {
-	Notify(message string) error
-}
-
-type RegistrationHandler struct {
-	Notifier Notifier
-}
-
-func NewRegistrationHandler(n Notifier) *RegistrationHandler {
-	return &RegistrationHandler{
-		Notifier: n,
-	}
-}
-
-func (r *RegistrationHandler) Register(name string) error {
-	err := r.Notifier.Notify("New user registered: " + name)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
+import (
+	"abstract/notifiers"
+	"abstract/handlers"
+)
+// composition root ( Herşeyinizi Başlatılan yer)
 func main() {
-	regHandler := NewRegistrationHandler(NewPushNotifier())
+	// notifiers
+	pushNotifier := notifiers.NewPushNotifier()
 
+	// repositories
+
+	// handlers
+	regHandler := handlers.NewRegistrationHandler(pushNotifier)
 	regHandler.Register("John")
+
+	// server
+
+	// start
 }
