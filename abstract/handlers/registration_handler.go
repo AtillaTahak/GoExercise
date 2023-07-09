@@ -1,15 +1,30 @@
 package handlers
 
+import (
+	"sync"
+)
+
 type RegistrationHandler struct {
 	Notifier Notifier
 }
+
+var lock sync.Mutex
+var registrationHandler *RegistrationHandler
+
 // NewRegistrationHandler, RegistrationHandler yapısının yeni bir örneğini döndürür.
 func NewRegistrationHandler(n Notifier) *RegistrationHandler {
-	return &RegistrationHandler{
-		Notifier: n,
+	if registrationHandler == nil {
+		lock.Lock()
+		if registrationHandler == nil {
+			registrationHandler = &RegistrationHandler{
+				Notifier: n,
+			}
+		}
+		lock.Unlock()
 	}
-}
+	return registrationHandler
 
+}
 func (r *RegistrationHandler) Register(name string) error {
 	err := r.Notifier.Notify("New user registered: " + name)
 	if err != nil {
@@ -17,6 +32,7 @@ func (r *RegistrationHandler) Register(name string) error {
 	}
 	return nil
 }
+
 /*
 
 Notifier arayüzü, bildirim göndermek için kullanılacak fonksiyonun belirli bir imzasını temsil eder. Bu arayüzü kullanarak farklı bildirim yöntemlerini destekleyen nesneleri kullanabiliriz.
